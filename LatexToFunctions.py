@@ -15,7 +15,7 @@ one_all = "\\varepsilon_{1}=\\frac{\sigma_{1}}{E_{y}}+\gamma_{1}+\gamma_{2}"
 two_original = "A_{1}=\frac{\sigma_{ys}\left(1+\varepsilon_{ys}\right)}{\left(\ln \left[1+\varepsilon_{ys}\right]\right)^{m_{1}}}"
 two_all = "A_{1}=\\frac{\sigma_{ys}(1+\\varepsilon_{ys})}{(\ln(1+\\varepsilon_{ys}))^{m_{1}}} "
 
-paraWithFoot = Word(alphas) + "_{" + Word(alphanums) + "}"  # 有脚标参数
+paraWithFoot = Combine(Word(alphas) + "_{" + Word(alphanums) + "}") # 有脚标参数
 parameter = Word(alphanums)  # 无脚标参数
 equal = Literal("=")  # 等于
 plus = Literal("+")  # 加

@@ -49,15 +49,6 @@ $$
 实例：
 
 $$\varepsilon_{1}=\frac{\sigma_{1}}{E_{\mathrm{y}}}+\gamma_{\mathrm{1}}+\gamma_{2}
-$$
-
-```python
-formula ::= parameter equal calculation+
-parameter ::= nums|alphas|"\\" + alphas + "_{"+ nums|alphas|parameter + "}"
-equal ::= "="
-specialCalculation ::= "\frac{"+parameter+"}"+"{"+parameter+"}"|^
-caculation ::=(parameter + "+")+|specialCalculation
-```
 
 ```python
 from pyparsing import *
@@ -70,8 +61,12 @@ plus = Literal("+")  # 加
 leftBrackets = Literal("(")  # 左括号
 rightBrackets = Literal(")")  # 右括号
 formula = paraWithFoot | parameter | equal | plus | leftBrackets | rightBrackets
+frac = Word("\\frac{") + formula + "}" + "{" + formula + "}"
 formulaTokens = formula.searchString(one_all)  # 寻找所有参数
+fracTokens = frac.searchString(one_all)  # 分数的两个参数
 print(formulaTokens)
+print(fracTokens)
 >>[['varepsilon', '_{', '1', '}'], ['='], ['frac'], ['sigma', '_{', '1', '}'], ['E', '_{', 'y', '}'], ['+'], ['gamma', '_{', '1', '}'], ['+'], ['gamma', '_{', '2', '}']]
+>> [['\\frac{\\', 'sigma', '_{', '1', '}', '}', '{', 'E', '_{', 'y', '}', '}']]
 ```
 
