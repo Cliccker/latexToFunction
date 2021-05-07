@@ -54,7 +54,7 @@ $$\varepsilon_{1}=\frac{\sigma_{1}}{E_{\mathrm{y}}}+\gamma_{\mathrm{1}}+\gamma_{
 from pyparsing import *
 one_original = "\varepsilon_{1}=\frac{\sigma_{1}}{E_{\mathrm{y}}}+\gamma_{\mathrm{1}}+\gamma_{2}"
 one_all = "\\varepsilon_{1}=\\frac{\sigma_{1}}{E_{y}}+\gamma_{1}+\gamma_{2}"
-paraWithFoot = Word(alphas) + "_{" + Word(alphanums) + "}"  # 有脚标参数
+paraWithFoot = Combine(Word(alphas) + "_{" + Word(alphanums) + "}") # 有脚标参数
 parameter = Word(alphanums)  # 无脚标参数
 equal = Literal("=")  # 等于
 plus = Literal("+")  # 加
@@ -66,7 +66,7 @@ formulaTokens = formula.searchString(one_all)  # 寻找所有参数
 fracTokens = frac.searchString(one_all)  # 分数的两个参数
 print(formulaTokens)
 print(fracTokens)
->>[['varepsilon', '_{', '1', '}'], ['='], ['frac'], ['sigma', '_{', '1', '}'], ['E', '_{', 'y', '}'], ['+'], ['gamma', '_{', '1', '}'], ['+'], ['gamma', '_{', '2', '}']]
->> [['\\frac{\\', 'sigma', '_{', '1', '}', '}', '{', 'E', '_{', 'y', '}', '}']]
+>>[['varepsilon_{1}'], ['='], ['frac'], ['sigma_{1}'], ['E_{y}'], ['+'], ['gamma_{1}'], ['+'], ['gamma_{2}']]
+>>[['\\frac{\\', 'sigma_{1}', '}', '{', 'E_{y}', '}']]
 ```
 
