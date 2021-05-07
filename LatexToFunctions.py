@@ -7,7 +7,6 @@
 @Time    : 2021/4/26 10:19
 """
 
-import sympy
 from pyparsing import *
 import math
 
@@ -18,20 +17,7 @@ two_original = "A_{1}=\frac{\sigma_{ys}\left(1+\varepsilon_{ys}\right)}{\left(\l
 two_all = "A_{1}=\\frac{\sigma_{ys}(1+\\varepsilon_{ys})}{(\(ln(1+\\varepsilon_{ys}))^{m_{1}}} "
 
 three_all = "\sigma_{1}=0.5\left(\sigma_{thetam}+\sigma_{sm}+\sqrt{(\sigma_{thetam}-\sigma_{sm}right)^{2}+4tau^{2}}right)"
-three_original = "\sigma_{1}=0.5\left(\sigma_{theta m }+\sigma_{ sm }+\sqrt{\left(\sigma_{theta_{ m }}-\sigma_{ sm }right)^{2}+4 tau^{2}}right)"
-
-
-def HandleLatex(latexText):
-    """
-    预处理latex公式
-    :param latexText: 公式
-    """
-    mathrm = Word("mathrm") + "{" + Word(alphanums) + "}"  # 新罗马字体
-    mathrmTokens = mathrm.searchString(latexText)
-    print(mathrmTokens)
-
-
-HandleLatex(three_original)
+three_original = "\sigma_{1}=0.5\left(\sigma_{theta m }+\sigma_{ sm }+\sqrt{\left(\sigma_{thetam}-\sigma_{ sm }right)^{2}+4 tau^{2}}right)"
 
 
 class Formula:
@@ -50,14 +36,13 @@ class Formula:
         plus = Literal("+")  # 加
         minus = Literal("-")  # 减
         # 主要参数
-        MainPara = Combine(Word(nums) + Optional('.' + Word(nums))) | Word(alphas)  # 字母、整数和小数
-        para = Combine(MainPara + Optional("_{" + Word(alphanums) + "}")).ignore(self.Symbol)  # 是否带有脚标
+        NumPara = Combine(Word(nums) + Optional('.' + Word(nums)))  # 整数和小数
+        AlphaPara = Combine(Word(alphas) + Optional("_{" + Word(alphanums) + "}")).ignore(self.Symbol)  # 字母、带有脚标的字母
         # 格式
-        formula = self.Symbol | para | equal | minus | plus | "(" | ")" | "{" | "}"  # 公式中包含的各个元素
-        part = delimitedList(printables, delim="+", combine=True)
+        Para = NumPara | AlphaPara
+        formula = self.Symbol | NumPara | AlphaPara | equal | minus | plus | "(" | ")" | "{" | "}"  # 公式中包含的各个元素
         self.formulaTokens = formula.searchString(self.latexText)  # 输出公式中的参数和运算符号
-        self.paraTokens = para.searchString(self.latexText)  # 所有参数
-        self.partTokens = part.searchString(self.latexText)
+        self.ParaTokens = Para.searchString(self.latexText)  # 所有参数
 
 
-print(Formula(latexText=three_original).partTokens)
+print(Formula(latexText=three_original).ParaTokens)
