@@ -8,6 +8,7 @@
 """
 
 from pyparsing import *
+import sympy
 import math
 
 one_original = "\varepsilon_{1}=\frac{\sigma_{1}}{E_{\mathrm{y}}}+\gamma_{\mathrm{1}}+\gamma_{2}"
@@ -22,15 +23,17 @@ three_original = "\sigma_{1}=0.5\left(\sigma_{theta m }+\sigma_{ sm }+\sqrt{\lef
 
 class Formula:
 
-    def __init__(self, latexText):
-        self.latexText = latexText.replace(" ", "")  # 去除所有空格
-        self.latexText = self.latexText.replace("\\", "")  # 去除反斜杠
-        self.latexText = self.latexText.replace("left", "")
-        self.latexText = self.latexText.replace("right", "")  # 去除标识符
-        print(self.latexText)
-
+    def __init__(self, latex):
+        self.latexText = latex
+        bias = {"\\": "", "\f": "f", "\a": "a", "\b": "b", "\n": "n", "\v": "v", "\t": "v", "\r": "r", "left": "",
+                "right": "", "[": "(", "]": ")", " ": ""}  # 所有可能产生歧义的字符，如转义、反斜杠、空格
+        # 预处理
+        for bia in bias.keys():
+            if bia in self.latexText:
+                self.latexText = self.latexText.replace(bia, bias[bia])
         # 特殊运算符号
-        self.Symbol = Word('frac') | "ln" | Literal("^") | "cos" | "sin" | "tan" | "sqrt" | "tanh"  # 计算符号
+        self.Symbol = Literal('frac') | Literal("ln") | Literal("^") | Literal("cos") | Literal("sin") | Literal(
+            "tan") | Literal("sqrt") | Literal("tanh")  # 计算符号
         # 基本运算符号
         equal = Literal("=")  # 等于
         plus = Literal("+")  # 加
@@ -38,11 +41,16 @@ class Formula:
         # 主要参数
         NumPara = Combine(Word(nums) + Optional('.' + Word(nums)))  # 整数和小数
         AlphaPara = Combine(Word(alphas) + Optional("_{" + Word(alphanums) + "}")).ignore(self.Symbol)  # 字母、带有脚标的字母
-        # 格式
-        Para = NumPara | AlphaPara
+        Para = (NumPara | AlphaPara).ignore(self.Symbol)
         formula = self.Symbol | NumPara | AlphaPara | equal | minus | plus | "(" | ")" | "{" | "}"  # 公式中包含的各个元素
+        # 公式、参数和特殊运算符
         self.formulaTokens = formula.searchString(self.latexText)  # 输出公式中的参数和运算符号
         self.ParaTokens = Para.searchString(self.latexText)  # 所有参数
+        self.SymbolTokens = self.Symbol.searchString(self.latexText)
 
 
-print(Formula(latexText=three_original).ParaTokens)
+f = Formula(latex=one_original)
+print("简化后的公式：{}".format(f.latexText))
+print("计算流程：{}".format(f.formulaTokens))
+print("参数：{}".format(f.ParaTokens))
+print("特殊运算符：{}".format(f.SymbolTokens))
