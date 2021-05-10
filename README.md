@@ -46,27 +46,28 @@ $$
 
 优势是可读性比较好，纯python，便于后期的维护
 
-实例：
+公式实例：
+$$
+K_{ e , k }=1.0+\frac{(1-n)}{n(m-1)}\left(\frac{\Delta S_{ n , k }}{S_{P S }}-1\right)
+$$
 
-$$\varepsilon_{1}=\frac{\sigma_{1}}{E_{\mathrm{y}}}+\gamma_{\mathrm{1}}+\gamma_{2}
+$$
+v_{ p }=\max \left[0.5-0.2\left(\frac{S_{v, k}}{S_{u,k}}\right) , v_{ e }\right]
+$$
 
-```python
-from pyparsing import *
-one_original = "\varepsilon_{1}=\frac{\sigma_{1}}{E_{\mathrm{y}}}+\gamma_{\mathrm{1}}+\gamma_{2}"
-one_all = "\\varepsilon_{1}=\\frac{\sigma_{1}}{E_{y}}+\gamma_{1}+\gamma_{2}"
-paraWithFoot = Combine(Word(alphas) + "_{" + Word(alphanums) + "}") # 有脚标参数
-parameter = Word(alphanums)  # 无脚标参数
-equal = Literal("=")  # 等于
-plus = Literal("+")  # 加
-leftBrackets = Literal("(")  # 左括号
-rightBrackets = Literal(")")  # 右括号
-formula = paraWithFoot | parameter | equal | plus | leftBrackets | rightBrackets
-frac = Word("\\frac{") + formula + "}" + "{" + formula + "}"
-formulaTokens = formula.searchString(one_all)  # 寻找所有参数
-fracTokens = frac.searchString(one_all)  # 分数的两个参数
-print(formulaTokens)
-print(fracTokens)
->>[['varepsilon_{1}'], ['='], ['frac'], ['sigma_{1}'], ['E_{y}'], ['+'], ['gamma_{1}'], ['+'], ['gamma_{2}']]
->>[['\\frac{\\', 'sigma_{1}', '}', '{', 'E_{y}', '}']]
-```
+$$
+D_{ f , k }=\frac{n_{ k }}{N_{ k }}
+$$
+
+$$
+\sum_{k=1}^{M} \frac{n_{ k }}{N_{ k }} \leqslant 1.0
+$$
+
+$$
+\Delta \varepsilon_{ k }=\frac{\Delta \sigma_{ k }}{E_{ ya , k }}+2\left(\frac{\Delta \sigma_{ k }}{2 K_{ cos }}\right)^{\frac{1}{n_{ esn }}}
+$$
+
+$$
+\sigma_{2}=0.5\left(\sigma_{\theta m }+\sigma_{ sm }-\sqrt{\left(\sigma_{\theta m }-\sigma_{ sm }\right)^{2}+4 \tau^{2}}\right)
+$$
 
