@@ -48,7 +48,7 @@ $$
 
 公式实例：
 $$
-K_{ e , k }=1.0+\frac{(1-n)}{n(m-1)}\left(\frac{\Delta S_{ n , k }}{S_{P S }}-1\right)
+K_{ e , k }=1.0+\frac{(1-n)}{n(m-1)}\left(\frac{\Delta S_{ n , k }}{S_{PS }}-1\right)
 $$
 
 $$
@@ -71,3 +71,9 @@ $$
 \sigma_{2}=0.5\left(\sigma_{\theta m }+\sigma_{ sm }-\sqrt{\left(\sigma_{\theta m }-\sigma_{ sm }\right)^{2}+4 \tau^{2}}\right)
 $$
 
+## 验证解析结果的准确度
+
+latexify-py
+$$
+\mathrm{f}(a, b)\triangleq \frac{\frac{1}{a + 2} + 1}{b}
+$$
