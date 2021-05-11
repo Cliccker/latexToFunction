@@ -64,7 +64,7 @@ $$
 $$
 
 $$
-\Delta \varepsilon_{ k }=\frac{\Delta \sigma_{ k }}{E_{ ya , k }}+2\left(\frac{\Delta \sigma_{ k }}{2 K_{ cos }}\right)^{\frac{1}{n_{ esn }}}
+\Delta \varepsilon_{ k }=\frac{\Delta \sigma_{ k }}{E_{ ya , k }}+2\left(\frac{\Delta \sigma_{ k }}{2 K_{ COS }}\right)^{\frac{1}{n_{ esn }}}
 $$
 
 $$
@@ -75,5 +75,15 @@ $$
 
 latexify-py
 $$
-\mathrm{f}(a, b)\triangleq \frac{\frac{1}{a + 2} + 1}{b}
+F=\frac{\frac{sin{1}}{A_{x}^{24}+2}+1}{\sqrt{B_{x}\ln{S_{1}}}}
 $$
+
+$$
+\mathrm{f}(a, b, c, d, e)\triangleq 0.52(a + b - \sqrt{(c - d)^{2} + 4e^{2}})
+$$
+
+词表
+
+训练比较方便
+
+LTP 命名实体识别标注集

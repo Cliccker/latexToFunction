@@ -12,8 +12,10 @@ import latexify
 import math
 import latexify
 
+
 @latexify.with_latex
-def f(a,b):
-    return ((1 / (a + 2)) + 1) / b
+def f(a, b, c, d, e):
+    return 0.52 * ((a + b) - math.sqrt((c - d) ** 2 + 4 * e ** 2))
+
 
 print(f)
