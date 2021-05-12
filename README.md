@@ -70,6 +70,40 @@ $$
 $$
 \sigma_{2}=0.5\left(\sigma_{\theta m }+\sigma_{ sm }-\sqrt{\left(\sigma_{\theta m }-\sigma_{ sm }\right)^{2}+4 \tau^{2}}\right)
 $$
+### 可能包含的特殊符号
+
+```python
+    builtin_callees = {
+        'abs': (r'\left|{', r'}\right|'),
+        'math.acos': (r'\arccos{\left({', r'}\right)}'),
+        'math.acosh': (r'\mathrm{arccosh}{\left({', r'}\right)}'),
+        'math.asin': (r'\arcsin{\left({', r'}\right)}'),
+        'math.asinh': (r'\mathrm{arcsinh}{\left({', r'}\right)}'),
+        'math.atan': (r'\arctan{\left({', r'}\right)}'),
+        'math.atanh': (r'\mathrm{arctanh}{\left({', r'}\right)}'),
+        'math.ceil': (r'\left\lceil{', r'}\right\rceil'),
+        'math.cos': (r'\cos{\left({', r'}\right)}'),
+        'math.cosh': (r'\cosh{\left({', r'}\right)}'),
+        'math.exp': (r'\exp{\left({', r'}\right)}'),
+        'math.fabs': (r'\left|{', r'}\right|'),
+        'math.factorial': (r'\left({', r'}\right)!'),
+        'math.floor': (r'\left\lfloor{', r'}\right\rfloor'),
+        'math.fsum': (r'\sum\left({', r'}\right)'),
+        'math.gamma': (r'\Gamma\left({', r'}\right)'),
+        'math.log': (r'\log{\left({', r'}\right)}'),
+        'math.log10': (r'\log_{10}{\left({', r'}\right)}'),
+        'math.log2': (r'\log_{2}{\left({', r'}\right)}'),
+        'math.prod': (r'\prod \left({', r'}\right)'),
+        'math.sin': (r'\sin{\left({', r'}\right)}'),
+        'math.sinh': (r'\sinh{\left({', r'}\right)}'),
+        'math.sqrt': (r'\sqrt{', '}'),
+        'math.tan': (r'\tan{\left({', r'}\right)}'),
+        'math.tanh': (r'\tanh{\left({', r'}\right)}'),
+        'sum': (r'\sum \left({', r'}\right)'),
+    }
+```
+
+
 
 ## 验证解析结果的准确度
 

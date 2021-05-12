@@ -202,7 +202,6 @@ class Formula:
         计算结果
         """
         self.ToFunction()
-        self.function = self.latexText
         self.InputValue()
         self.Calculate()
 
