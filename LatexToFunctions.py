@@ -10,6 +10,7 @@
 from pyparsing import *
 import sympy
 import math
+import latexify
 
 latexList = ["K_{ e , k }=1.0+\frac{(1-n)}{n*(m-1)}\left(\frac{\Delta S_{ n , k }}{S_{P S }}-1\right)",
              "v_{ p }=\max \left[0.5-0.2\left(\frac{S_{v, k}}{S_{u,k}}\right) , v_{ e }\right]",
@@ -25,6 +26,7 @@ latexList = ["K_{ e , k }=1.0+\frac{(1-n)}{n*(m-1)}\left(\frac{\Delta S_{ n , k 
 class Formula:
 
     def __init__(self, latex):
+        self.function = ""
         self.latexText = latex
         bias = {"\\": "", "\f": "f", "\a": "a", "\b": "b", "\n": "n", "\v": "v", "\t": "t", "\r": "r", "left": "",
                 "right": "", "[": "(", "]": ")", " ": ""}  # 所有可能产生歧义的字符，如转义、反斜杠、空格
@@ -43,23 +45,23 @@ class Formula:
         Lparen = Literal("(")  # (
         Rparen = Literal(")")  # )
         # 特殊运算符号
-        TriangleSymbol =Literal("tanh")|Literal("cos") | Literal("sin") | Literal("tan")
+        TriangleSymbol = Literal("tanh") | Literal("cos") | Literal("sin") | Literal("tan")
         self.SpecialSymbol = Literal('frac') | Literal("ln") | Literal("^") | Literal("sqrt") | Literal(
             "max") | Literal("leqslant") | TriangleSymbol  # 计算符号
-        MathSymbol = Literal("math.tanh") |Literal("math.cos") | Literal("math.sin") | Literal("math.tan") |  Literal(
+        MathSymbol = Literal("math.tanh") | Literal("math.cos") | Literal("math.sin") | Literal("math.tan") | Literal(
             "math.log") | Literal("math.sqrt")
         self.SpecialSymbol = self.SpecialSymbol.ignore(MathSymbol)
         # 主要参数
         NumPara = Combine(Optional("{") + Word(nums) + Optional('.' + Word(nums)) + Optional("}"))  # 整数和小数
         Foot = Combine(Word(alphanums) + ZeroOrMore(comma + Word(alphanums)))  # 脚标的不同形式
-        AlphaPara = Combine(Word(alphas) + Optional("_{" + Foot + "}")).ignore(
+        self.AlphaPara = Combine(Word(alphas) + Optional("_{" + Foot + "}")).ignore(
             self.SpecialSymbol)  # 字母、带有脚标的字母，为需要输入的参数
-        AlphaPara = AlphaPara.ignore(MathSymbol)
+        self.AlphaPara = self.AlphaPara.ignore(MathSymbol)
         Symbol = self.SpecialSymbol | MathSymbol | equal | minus | plus | comma | multiply | divide | power  # 计算符号
-        self.formula = Symbol | NumPara | AlphaPara | "(" | ")" | "{" | "}"  # 公式中包含的各个元素
+        self.formula = Symbol | NumPara | self.AlphaPara | "(" | ")" | "{" | "}"  # 公式中包含的各个元素
         # 特殊计算
         SepNumPara = Combine(Word(nums) + Optional('.' + Word(nums)))  # 特殊计算中的数字不能包含于{}
-        ScopePara = self.SpecialSymbol | MathSymbol | AlphaPara | SepNumPara | equal | minus | plus | comma | multiply | divide | power  # 特殊计算可能包括的参数形式
+        ScopePara = self.SpecialSymbol | MathSymbol | self.AlphaPara | SepNumPara | equal | minus | plus | comma | multiply | divide | power  # 特殊计算可能包括的参数形式
         CalculatingUnit = ScopePara | "(" | ")"  # 特殊计算的计算单元
         BracketPara = Group("{" + Combine(OneOrMore(CalculatingUnit)) + "}")  # 特殊计算的参数
         self.Frac = Literal("frac") + BracketPara + BracketPara
@@ -67,16 +69,18 @@ class Formula:
         self.Triangle = TriangleSymbol + BracketPara
         self.Power = Literal("^") + BracketPara
         self.Ln = Literal("ln") + BracketPara
-        self.Multiply = MathSymbol + Lparen | AlphaPara + Lparen | AlphaPara + Lparen | SepNumPara + Lparen | Rparen + (
-                AlphaPara | SepNumPara) | Rparen + Lparen | (AlphaPara | SepNumPara) + (AlphaPara | SepNumPara) |(
-                AlphaPara | SepNumPara) + MathSymbol
+        self.Multiply = MathSymbol + Lparen | self.AlphaPara + Lparen | self.AlphaPara + Lparen | SepNumPara + Lparen | Rparen + (
+                self.AlphaPara | SepNumPara) | Rparen + Lparen | (self.AlphaPara | SepNumPara) + (
+                                self.AlphaPara | SepNumPara) | (
+                                self.AlphaPara | SepNumPara) + MathSymbol
         self.MultiplyMath = MathSymbol + Lparen
         # 公式、参数和特殊运算符
         self.formulaTokens = sum(self.formula.searchString(self.latexText))  # 输出公式中的参数和运算符号
         self.Answer = self.formulaTokens[0]  # 结果
         self.latexText = self.latexText.replace(self.Answer + "=", "")
-        self.alphaParaTokens = AlphaPara.searchString(self.latexText).asList()  # 所有变量
+        self.alphaParaTokens = self.AlphaPara.searchString(self.latexText).asList()  # 所有变量
         self.specialSymbolTokens = sum(self.SpecialSymbol.searchString(self.latexText))  # 所有特殊计算符号
+
         self.ParaValue = {}
 
     def SearchSpePara(self):
@@ -180,10 +184,9 @@ class Formula:
         print("计算结果:{}={}".format(self.Answer, result))
 
     def ToFunction(self):
-        # print("计算流程：{}".format(f.formulaTokens))
-        # print("参数：{}".format(f.AlphaParaTokens))
-        # print("特殊运算符：{}".format(f.specialSymbolTokens))
-        # print("简化后的公式：{}".format(f.latexText))
+        """
+        转化为python计算的公式
+        """
         while self.specialSymbolTokens:
             self.TransLn()
             self.TransTriangle()
@@ -192,9 +195,55 @@ class Formula:
             self.TransFrac()
             self.SearchSpePara()
         self.TransMultiply()
+        self.function = self.latexText
+
+    def GetResult(self):
+        """
+        计算结果
+        """
+        self.ToFunction()
+        self.function = self.latexText
         self.InputValue()
         self.Calculate()
 
+    def GetPyFunction(self, FunctionName):
+        """
+        生成py文件
+        :param FunctionName: 生成py文件中函数的名称
+        """
+        self.ToFunction()
+        self.ToPyFile(FunctionName)
 
-f = Formula(latex=latexList[4])
-f.ToFunction()
+    def ToPyFile(self, FunctionName):
+        """
+        将计算公式转换为python文件
+        """
+        # 为每一个参数找到替换的参数
+        newParaName = {}
+        Para = [chr(i) for i in range(65, 91)]
+        count = 0
+        for item in self.alphaParaTokens:
+            if item[0] not in newParaName.keys():
+                newParaName[item[0]] = Para[count]
+                count += 1
+        # 重新组织新的Python函数式
+        a = self.formula.searchString(self.function).asList()
+        b = [i[0] for i in a]
+        c = [newParaName[i] if i in newParaName else i for i in b]
+        formula = "".join(c)
+        NewParas = ",".join(newParaName.values())
+        # python文件内容
+        Line_0 = "import math,latexify"  # 库
+        Line_1 = "\n\nParas=" + str(newParaName)  # 参数索引
+        Line_2 = "\n\n@latexify.with_latex"  # 域
+        Line_3 = "\n\ndef " + FunctionName + "(" + NewParas + "):" + "\n" + "\t" + "return " + formula  # 函数主体
+        Line_4 = "\n\nprint(" + FunctionName + ")"  # 显示latex函数
+        Line = Line_0 + Line_1 + Line_2 + Line_3 + Line_4
+        with open("Data/" + FunctionName + ".py", "w+") as File:
+            File.write(Line)
+        print("saved")
+
+
+f = Formula(latex=latexList[6])
+f.GetResult()
+f.GetPyFunction("F3_2_2")

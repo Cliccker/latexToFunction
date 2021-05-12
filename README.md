@@ -14,7 +14,7 @@
 
 ![原公式](https://my-picbed.oss-cn-hangzhou.aliyuncs.com/img/20210427143953.png)
 $$
-F_{\mathrm{a}}=\frac{\left[1-\frac{1}{2 C_{\mathrm{c}}^{2}}\left(\frac{2 L_{\mathrm{v}}}{R_{\mathrm{ge}}}\right)^{2}\right] S_{\mathrm{y}}}{\frac{5}{3}+\frac{3}{8 C_{\mathrm{a}}}\left(\frac{2 L_{\mathrm{v}}}{R_{\mathrm{ge}}}\right)-\frac{1}{8 C_{\mathrm{c}}^{3}}\left(\frac{2 L_{\mathrm{v}}}{R_{\mathrm{gn}}}\right)^{3}}
+F_{\mathrm{self}}=\frac{\left[1-\frac{1}{2 C_{\mathrm{c}}^{2}}\left(\frac{2 L_{\mathrm{v}}}{R_{\mathrm{ge}}}\right)^{2}\right] S_{\mathrm{y}}}{\frac{5}{3}+\frac{3}{8 C_{\mathrm{self}}}\left(\frac{2 L_{\mathrm{v}}}{R_{\mathrm{ge}}}\right)-\frac{1}{8 C_{\mathrm{c}}^{3}}\left(\frac{2 L_{\mathrm{v}}}{R_{\mathrm{gn}}}\right)^{3}}
 $$
 还有国内的公式识别服务提供商，比如有道公式、腾讯优图。
 
@@ -79,7 +79,7 @@ F=\frac{\frac{sin{1}}{A_{x}^{24}+2}+1}{\sqrt{B_{x}\ln{S_{1}}}}
 $$
 
 $$
-\mathrm{f}(a, b, c, d, e)\triangleq 0.52(a + b - \sqrt{(c - d)^{2} + 4e^{2}})
+\mathrm{f}(self, b, c, d, e)\triangleq 0.52(self + b - \sqrt{(c - d)^{2} + 4e^{2}})
 $$
 
 词表
