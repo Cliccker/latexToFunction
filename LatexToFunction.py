@@ -1,26 +1,14 @@
 # -*- coding: utf-8 -*-
 
 """
-@File    : LatexToFunctions.py
+@File    : LatexToFunction.py
 @Author  : Hangcheng
 @Email   : megamhc@gmail.com
 @Time    : 2021/4/26 10:19
 """
 
 from pyparsing import *
-import sympy
-import math
-import latexify
-
-latexList = ["K_{ e , k }=1.0+\frac{(1-n)}{n*(m-1)}\left(\frac{\Delta S_{ n , k }}{S_{P S }}-1\right)",
-             "v_{ p }=\max \left[0.5-0.2\left(\frac{S_{v, k}}{S_{u,k}}\right) , v_{ e }\right]",
-             "\sum_{k=1}^{M} \frac{n_{ k }}{N_{ k }} \leqslant 1.0",
-             "\Delta \varepsilon_{ k }=\frac{\Delta \sigma_{ k }}{E_{ ya , k }}+2\left(\frac{\Delta \sigma_{ k }}{2 K_{ COS }}\right)^{\frac{1}{n_{ esn }}}",
-             "\sigma_{2}=0.52\left((\sigma_{\theta m }+\sigma_{ sm })-\sqrt{\left(\sigma_{\theta m }-\sigma_{ sm }\right)^{2}+4 \tau^{2}}\right)",
-             "(\sigma_{\theta m }+\sigma_{ sm }-\sqrt{\left\sigma_{\theta m }-\sigma_{ sm }\right^{2}+4 \tau^{2}}\right)",
-             "F=\frac{\frac{tanh{1}}{A_{x}^{24}+2}+1}{\sqrt{B_{x}\ln{S_{1}}}}",
-             "frac{((1)/(A_{x}^{24}+2))+1}{sqrt{S_{1}}}",
-             "F=((((math.tanh(1))/(A_{x}**(24)+2))+1)/(math.sqrt(math.log(2S_{1}))))"]
+import math  # 这个必须有
 
 
 class Formula:
@@ -29,11 +17,12 @@ class Formula:
         self.function = ""
         self.latexText = latex
         bias = {"\\": "", "\f": "f", "\a": "a", "\b": "b", "\n": "n", "\v": "v", "\t": "t", "\r": "r", "left": "",
-                "right": "", "[": "(", "]": ")", " ": ""}  # 所有可能产生歧义的字符，如转义、反斜杠、空格
+                "right": "", "[": "(", "]": ")", " ": "", "^{*}": "'"}  # 所有可能产生歧义的字符，如转义、反斜杠、空格
         # 预处理
         for bia in bias.keys():
             if bia in self.latexText:
                 self.latexText = self.latexText.replace(bia, bias[bia])
+
         # 基本运算符号
         equal = Literal("=")  # 等于
         plus = Literal("+")  # 加
@@ -44,21 +33,28 @@ class Formula:
         comma = Literal(",")  # 逗号
         Lparen = Literal("(")  # (
         Rparen = Literal(")")  # )
+
         # 特殊运算符号
         TriangleSymbol = Literal("tanh") | Literal("cos") | Literal("sin") | Literal("tan")
         self.SpecialSymbol = Literal('frac') | Literal("ln") | Literal("^") | Literal("sqrt") | Literal(
-            "max") | Literal("leqslant") | TriangleSymbol  # 计算符号
+            "max") | Literal("leqslant") | TriangleSymbol  # 特殊计算符号
         MathSymbol = Literal("math.tanh") | Literal("math.cos") | Literal("math.sin") | Literal("math.tan") | Literal(
             "math.log") | Literal("math.sqrt")
         self.SpecialSymbol = self.SpecialSymbol.ignore(MathSymbol)
+        # 区别星号角标
         # 主要参数
         NumPara = Combine(Optional("{") + Word(nums) + Optional('.' + Word(nums)) + Optional("}"))  # 整数和小数
         Foot = Combine(Word(alphanums) + ZeroOrMore(comma + Word(alphanums)))  # 脚标的不同形式
-        self.AlphaPara = Combine(Word(alphas) + Optional("_{" + Foot + "}")).ignore(
-            self.SpecialSymbol)  # 字母、带有脚标的字母，为需要输入的参数
+
+        AlphaPara_1 = Combine(Word(alphas) + Optional("_{" + Foot + "}") + Optional("'")) # 字母、带有脚标的字母
+        AlphaPara_2 = Combine("("+Word(alphas)+"_{" + Foot + "}"+Optional("'")+")_{" + Foot + "}")# (A_x')_b
+        self.AlphaPara = AlphaPara_2 | AlphaPara_1
+        self.AlphaPara = self.AlphaPara.ignore(self.SpecialSymbol)
         self.AlphaPara = self.AlphaPara.ignore(MathSymbol)
+
         Symbol = self.SpecialSymbol | MathSymbol | equal | minus | plus | comma | multiply | divide | power  # 计算符号
         self.formula = Symbol | NumPara | self.AlphaPara | "(" | ")" | "{" | "}"  # 公式中包含的各个元素
+
         # 特殊计算
         SepNumPara = Combine(Word(nums) + Optional('.' + Word(nums)))  # 特殊计算中的数字不能包含于{}
         ScopePara = self.SpecialSymbol | MathSymbol | self.AlphaPara | SepNumPara | equal | minus | plus | comma | multiply | divide | power  # 特殊计算可能包括的参数形式
@@ -74,14 +70,14 @@ class Formula:
                                 self.AlphaPara | SepNumPara) | (
                                 self.AlphaPara | SepNumPara) + MathSymbol
         self.MultiplyMath = MathSymbol + Lparen
+
         # 公式、参数和特殊运算符
         self.formulaTokens = sum(self.formula.searchString(self.latexText))  # 输出公式中的参数和运算符号
         self.Answer = self.formulaTokens[0]  # 结果
-        self.latexText = self.latexText.replace(self.Answer + "=", "")
+        self.latexText = self.latexText.replace(self.Answer + "=", "")  # 去除答案部分，因为在这里他不重要
         self.alphaParaTokens = self.AlphaPara.searchString(self.latexText).asList()  # 所有变量
         self.specialSymbolTokens = sum(self.SpecialSymbol.searchString(self.latexText))  # 所有特殊计算符号
-
-        self.ParaValue = {}
+        self.ParaValue = {}  # 存储参数值
 
     def SearchSpePara(self):
         """
@@ -137,6 +133,7 @@ class Formula:
         将所有的frac{x}{y}替换为(x)/(y)
         """
         fracTokens = self.Frac.searchString(self.latexText).asList()
+        # print(fracTokens)
         for item in fracTokens:
             head = item[1][1]
             tail = item[2][1]
@@ -195,13 +192,13 @@ class Formula:
             self.TransFrac()
             self.SearchSpePara()
         self.TransMultiply()
+
         self.function = self.latexText
 
     def GetResult(self):
         """
         计算结果
         """
-        self.ToFunction()
         self.InputValue()
         self.Calculate()
 
@@ -210,7 +207,6 @@ class Formula:
         生成py文件
         :param FunctionName: 生成py文件中函数的名称
         """
-        self.ToFunction()
         self.ToPyFile(FunctionName)
 
     def ToPyFile(self, FunctionName):
@@ -241,8 +237,3 @@ class Formula:
         with open("Data/" + FunctionName + ".py", "w+") as File:
             File.write(Line)
         print("saved")
-
-
-f = Formula(latex=latexList[6])
-f.GetResult()
-f.GetPyFunction("F3_2_2")
