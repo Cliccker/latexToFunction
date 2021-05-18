@@ -22,11 +22,12 @@ from LatexToFunction import Formula
 latexList = ["G^{*}=\frac{E^{*}}{2\left(1+v^{*}\right)}",
              "\left(\sigma_{ r }^{*}\right)_{ P }=\left(\sigma_{ T }^{*}\right)_{ a }-\frac{1}{2}\left(G_{ p }^{*}-G_{ d }^{*}\right)\left(\varepsilon_{ i }^{*}-\varepsilon_{0}^{*}\right)",
              "\sigma_{0}=\frac{1}{\mu^{*}}\left(K_{ x } \sigma_{ x }^{*}+K_{ y } \sigma_{ y }^{*}+K_{ xy } \tau_{ xy }^{*}\right)",
-             "\sigma_{ p }^{*}=K_{ skin }\left[\frac{E *\alpha\left(T_{ m }-T_{ s }\right)}{(1-v)}\right]",
-             "K_{vkin}=\frac{9.43983-421.179 \mu^{*}+6893.05 (\mu^{*})^{2}}{1+4991.39 \mu^{*}+6032.92 (\mu^{*})^{2}-1466.19 (\mu^{*})^{3}}",
+             "\sigma_{ p }^{*}=K_{ skin }\left[\frac{E\alpha\left(T_{ m }-T_{ s }\right)}{(1-v)}\right]",
+             "K_{vkin}=\frac{9.43983-421.179 \mu^{*}+6893.05 \mu^{*2}}{1+4991.39 \mu^{*}+6032.92 \mu^{*2}-1466.19 \mu^{*3}}",
              "K_{ e , k }=1.0+\frac{(1-n)}{n*(m-1)}\left(\frac{\Delta S_{ n , k }}{S_{P S }}-1\right)",
-             "F=\frac{\frac{tanh{1}}{A_{x}^{24}+2}+1}{\sqrt{B_{x}\ln{S_{1}}}}"]
-index = 5
+             "F=\frac{\frac{tanh{1}}{A_{x}^{24}+2}+1}{\sqrt{B_{x}\ln{S_{1}}}}",
+             "v_{ p }=\max \left[0.5-0.2\left(\frac{S_{v, k}}{S_{u,k}}\right) , v_{ e }\right]"]
+index = 7
 f = Formula(latex=latexList[index])
 f.ToFunction()
 f.GetResult()

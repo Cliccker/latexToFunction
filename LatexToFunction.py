@@ -8,6 +8,7 @@
 """
 
 from pyparsing import *
+import sys
 import math  # 这个必须有
 
 
@@ -17,7 +18,8 @@ class Formula:
         self.function = ""
         self.latexText = latex
         bias = {"\\": "", "\f": "f", "\a": "a", "\b": "b", "\n": "n", "\v": "v", "\t": "t", "\r": "r", "left": "",
-                "right": "", "[": "(", "]": ")", " ": "", "^{*}": "'"}  # 所有可能产生歧义的字符，如转义、反斜杠、空格
+                "right": "", "[": "(", "]": ")", " ": "", "^{*}": "'", "^{*2}": "'^{2}",
+                "^{*3}": "'^{3}"}  # 所有可能产生歧义的字符，如转义、反斜杠、空格
         # 预处理
         for bia in bias.keys():
             if bia in self.latexText:
@@ -33,21 +35,20 @@ class Formula:
         comma = Literal(",")  # 逗号
         Lparen = Literal("(")  # (
         Rparen = Literal(")")  # )
-
         # 特殊运算符号
         TriangleSymbol = Literal("tanh") | Literal("cos") | Literal("sin") | Literal("tan")
-        self.SpecialSymbol = Literal('frac') | Literal("ln") | Literal("^") | Literal("sqrt") | Literal(
-            "max") | Literal("leqslant") | TriangleSymbol  # 特殊计算符号
+        self.SpecialSymbol = Literal('frac') | Literal("ln") | Literal("^") | Literal("sqrt") |Literal("leqslant") | TriangleSymbol  # 特殊计算符号
         MathSymbol = Literal("math.tanh") | Literal("math.cos") | Literal("math.sin") | Literal("math.tan") | Literal(
-            "math.log") | Literal("math.sqrt")
+            "math.log") | Literal("math.sqrt") | Literal("max")
         self.SpecialSymbol = self.SpecialSymbol.ignore(MathSymbol)
         # 区别星号角标
+
         # 主要参数
         NumPara = Combine(Optional("{") + Word(nums) + Optional('.' + Word(nums)) + Optional("}"))  # 整数和小数
         Foot = Combine(Word(alphanums) + ZeroOrMore(comma + Word(alphanums)))  # 脚标的不同形式
 
-        AlphaPara_1 = Combine(Word(alphas) + Optional("_{" + Foot + "}") + Optional("'")) # 字母、带有脚标的字母
-        AlphaPara_2 = Combine("("+Word(alphas)+"_{" + Foot + "}"+Optional("'")+")_{" + Foot + "}")# (A_x')_b
+        AlphaPara_1 = Combine(Word(alphas) + Optional("_{" + Foot + "}") + Optional("'"))  # 字母、带有脚标的字母
+        AlphaPara_2 = Combine("(" + Word(alphas) + "_{" + Foot + "}" + Optional("'") + ")_{" + Foot + "}")  # (A_x')_b
         self.AlphaPara = AlphaPara_2 | AlphaPara_1
         self.AlphaPara = self.AlphaPara.ignore(self.SpecialSymbol)
         self.AlphaPara = self.AlphaPara.ignore(MathSymbol)
@@ -184,13 +185,21 @@ class Formula:
         """
         转化为python计算的公式
         """
-        while self.specialSymbolTokens:
-            self.TransLn()
-            self.TransTriangle()
-            self.TransPow()
-            self.TransSqrt()
-            self.TransFrac()
-            self.SearchSpePara()
+        count = 1
+        while count < 20:
+            if self.specialSymbolTokens:
+                count += 1
+                self.TransLn()
+                self.TransTriangle()
+                self.TransPow()
+                self.TransSqrt()
+                self.TransFrac()
+                self.SearchSpePara()
+            else:
+                break
+        else:  # 错误信息，包括不能解析的符号和公式
+            pass
+            # raise Exception('Early Stop\n{}\n{}'.format(self.specialSymbolTokens, self.latexText))
         self.TransMultiply()
 
         self.function = self.latexText
