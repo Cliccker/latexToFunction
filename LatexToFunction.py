@@ -8,7 +8,6 @@
 """
 
 from pyparsing import *
-import sys
 import math  # 这个必须有
 
 
@@ -19,7 +18,7 @@ class Formula:
         self.latexText = latex
         bias = {"\\": "", "\f": "f", "\a": "a", "\b": "b", "\n": "n", "\v": "v", "\t": "t", "\r": "r", "left": "",
                 "right": "", "[": "(", "]": ")", " ": "", "^{*}": "'", "^{*2}": "'^{2}",
-                "^{*3}": "'^{3}"}  # 所有可能产生歧义的字符，如转义、反斜杠、空格
+                "^{*3}": "'^{3}", "exp": "math.exp"}  # 所有可能产生歧义的字符，如转义、反斜杠、空格，可以直接转换的字符，如exp(x)
         # 预处理
         for bia in bias.keys():
             if bia in self.latexText:
@@ -36,10 +35,11 @@ class Formula:
         Lparen = Literal("(")  # (
         Rparen = Literal(")")  # )
         # 特殊运算符号
-        TriangleSymbol = Literal("tanh") | Literal("cos") | Literal("sin") | Literal("tan")
-        self.SpecialSymbol = Literal('frac') | Literal("ln") | Literal("^") | Literal("sqrt") |Literal("leqslant") | TriangleSymbol  # 特殊计算符号
+        self.TriangleSymbol = Literal("tanh") | Literal("cos") | Literal("sin") | Literal("tan")
+        self.SpecialSymbol = Literal('frac') | Literal("ln") | Literal("^") | Literal("sqrt") | Literal(
+            "leqslant") | Literal("exp") | self.TriangleSymbol  # 特殊计算符号
         MathSymbol = Literal("math.tanh") | Literal("math.cos") | Literal("math.sin") | Literal("math.tan") | Literal(
-            "math.log") | Literal("math.sqrt") | Literal("max")
+            "math.log") | Literal("math.sqrt") | Literal("max") | Literal("math.exp")
         self.SpecialSymbol = self.SpecialSymbol.ignore(MathSymbol)
         # 区别星号角标
 
@@ -60,18 +60,13 @@ class Formula:
         SepNumPara = Combine(Word(nums) + Optional('.' + Word(nums)))  # 特殊计算中的数字不能包含于{}
         ScopePara = self.SpecialSymbol | MathSymbol | self.AlphaPara | SepNumPara | equal | minus | plus | comma | multiply | divide | power  # 特殊计算可能包括的参数形式
         CalculatingUnit = ScopePara | "(" | ")"  # 特殊计算的计算单元
-        BracketPara = Group("{" + Combine(OneOrMore(CalculatingUnit)) + "}")  # 特殊计算的参数
-        self.Frac = Literal("frac") + BracketPara + BracketPara
-        self.Sqrt = Literal("sqrt") + BracketPara
-        self.Triangle = TriangleSymbol + BracketPara
-        self.Power = Literal("^") + BracketPara
-        self.Ln = Literal("ln") + BracketPara
+        self.BracketPara = Group("{" + Combine(OneOrMore(CalculatingUnit)) + "}")  # 特殊计算的参数
+        # 乘法
         self.Multiply = MathSymbol + Lparen | self.AlphaPara + Lparen | self.AlphaPara + Lparen | SepNumPara + Lparen | Rparen + (
                 self.AlphaPara | SepNumPara) | Rparen + Lparen | (self.AlphaPara | SepNumPara) + (
                                 self.AlphaPara | SepNumPara) | (
                                 self.AlphaPara | SepNumPara) + MathSymbol
         self.MultiplyMath = MathSymbol + Lparen
-
         # 公式、参数和特殊运算符
         self.formulaTokens = sum(self.formula.searchString(self.latexText))  # 输出公式中的参数和运算符号
         self.Answer = self.formulaTokens[0]  # 结果
@@ -101,7 +96,8 @@ class Formula:
         """
         转换对数函数
         """
-        Tokens = self.Ln.searchString(self.latexText).asList()
+        Ln = Literal("ln") + self.BracketPara
+        Tokens = Ln.searchString(self.latexText).asList()
         for item in Tokens:
             New = "math.log(" + item[1][1] + ")"
             Original = item[0] + ''.join(item[1])
@@ -111,36 +107,40 @@ class Formula:
         """
         转换三角函数
         """
-        self.TransToMath(self.Triangle)
+        Triangle = self.TriangleSymbol + self.BracketPara
+        self.TransToMath(Triangle)
 
     def TransPow(self):
         """
         将所有^转换成**
         """
-        PowerTokens = self.Power.searchString(self.latexText).asList()
+        Power = Literal("^") + self.BracketPara
+        PowerTokens = Power.searchString(self.latexText).asList()
         for item in PowerTokens:
-            Square = "**" + "(" + item[1][1] + ")"
-            sqrt = item[0] + ''.join(item[1])
-            self.latexText = self.latexText.replace(sqrt, Square)
+            New = "**" + "(" + item[1][1] + ")"
+            Old = item[0] + ''.join(item[1])
+            self.latexText = self.latexText.replace(Old, New)
 
     def TransSqrt(self):
         """
-        将所有sqrt转换成math.sqrt(x)1
+        将所有sqrt转换成math.sqrt(x)
         """
-        self.TransToMath(self.Sqrt)
+        Sqrt = Literal("sqrt") + self.BracketPara
+        self.TransToMath(Sqrt)
 
     def TransFrac(self):
         """
         将所有的frac{x}{y}替换为(x)/(y)
         """
-        fracTokens = self.Frac.searchString(self.latexText).asList()
+        Frac = Literal("frac") + self.BracketPara + self.BracketPara
+        fracTokens = Frac.searchString(self.latexText).asList()
         # print(fracTokens)
         for item in fracTokens:
             head = item[1][1]
             tail = item[2][1]
-            Divide = "((" + head + ")/(" + tail + "))"
-            Frac = item[0] + ''.join(item[1]) + ''.join(item[2])
-            self.latexText = self.latexText.replace(Frac, Divide)
+            New = "((" + head + ")/(" + tail + "))"
+            Old = item[0] + ''.join(item[1]) + ''.join(item[2])
+            self.latexText = self.latexText.replace(Old, New)
 
     def TransMultiply(self):
         """
@@ -238,11 +238,13 @@ class Formula:
         NewParas = ",".join(newParaName.values())
         # python文件内容
         Line_0 = "import math,latexify"  # 库
-        Line_1 = "\n\nParas=" + str(newParaName)  # 参数索引
+        Line_1 = "\n\nParas = " + str(newParaName)  # 参数索引
         Line_2 = "\n\n@latexify.with_latex"  # 域
         Line_3 = "\n\ndef " + FunctionName + "(" + NewParas + "):" + "\n" + "\t" + "return " + formula  # 函数主体
         Line_4 = "\n\nprint(" + FunctionName + ")"  # 显示latex函数
         Line = Line_0 + Line_1 + Line_2 + Line_3 + Line_4
-        with open("Data/" + FunctionName + ".py", "w+") as File:
+        SavedFilename = "Data/" + FunctionName + ".py"
+        with open(SavedFilename, "w+") as File:
             File.write(Line)
-        print("saved")
+        print("Validation:")
+        exec(compile(open(SavedFilename, "rb").read(), SavedFilename, "exec"))  # 执行保存下的函数

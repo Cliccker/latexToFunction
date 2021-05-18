@@ -70,6 +70,16 @@ $$
 $$
 \sigma_{2}=0.5\left(\sigma_{\theta m }+\sigma_{ sm }-\sqrt{\left(\sigma_{\theta m }-\sigma_{ sm }\right)^{2}+4 \tau^{2}}\right)
 $$
+$$
+F=\frac{\frac{sin{1}}{A_{x}^{24}+2}+1}{\sqrt{B_{x}\ln{S_{1}}}}
+$$
+
+$$
+A_{2}=\frac{\sigma_{ uts } \exp \left[m_{2}\right]}{m_{2}^{m_{2}}}
+$$
+
+
+
 ### 可能包含的特殊符号
 
 ```python
@@ -103,27 +113,8 @@ $$
     }
 ```
 
-
-
-## 验证解析结果的准确度
-
-latexify-py
-$$
-F=\frac{\frac{sin{1}}{A_{x}^{24}+2}+1}{\sqrt{B_{x}\ln{S_{1}}}}
-$$
-
-$$
-\mathrm{f}(self, b, c, d, e)\triangleq 0.52(self + b - \sqrt{(c - d)^{2} + 4e^{2}})
-$$
-
-词表
-
-训练比较方便
-
-LTP 命名实体识别标注集
-
 # 关于公式的格式
 
 + $X^{*}$会被替换成$X'$，因为^和*会有歧义
-+ 
++ 暂时采用了直接替换的方法，将$X^{*2}$替换成了$X'^{2}$，但后续可能存在$X^{*a}$的情况。
 

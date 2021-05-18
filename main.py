@@ -26,9 +26,16 @@ latexList = ["G^{*}=\frac{E^{*}}{2\left(1+v^{*}\right)}",
              "K_{vkin}=\frac{9.43983-421.179 \mu^{*}+6893.05 \mu^{*2}}{1+4991.39 \mu^{*}+6032.92 \mu^{*2}-1466.19 \mu^{*3}}",
              "K_{ e , k }=1.0+\frac{(1-n)}{n*(m-1)}\left(\frac{\Delta S_{ n , k }}{S_{P S }}-1\right)",
              "F=\frac{\frac{tanh{1}}{A_{x}^{24}+2}+1}{\sqrt{B_{x}\ln{S_{1}}}}",
-             "v_{ p }=\max \left[0.5-0.2\left(\frac{S_{v, k}}{S_{u,k}}\right) , v_{ e }\right]"]
-index = 7
-f = Formula(latex=latexList[index])
-f.ToFunction()
-f.GetResult()
-f.GetPyFunction("Formula_" + str(index))
+             "v_{ p }=\max \left[0.5-0.2\left(\frac{S_{v, k}}{S_{u,k}}\right) , v_{ e }\right]",
+             "A_{2}=\frac{\sigma_{ uts } \exp \left[m_{2}\right]}{m_{2}^{m_{2}}}"]
+
+
+def Main(index):
+    f = Formula(latex=latexList[index])
+    f.ToFunction()
+    f.GetPyFunction("Formula_" + str(index))
+
+
+
+for index in range(0, 7):
+    Main(index)
