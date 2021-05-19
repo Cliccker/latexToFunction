@@ -19,7 +19,8 @@ from LatexToFunction import Formula
 #              "frac{((1)/(A_{x}^{24}+2))+1}{sqrt{S_{1}}}",
 #              "F=((((math.tanh(1))/(A_{x}**(24)+2))+1)/(math.sqrt(math.log(2S_{1}))))"]
 
-latexList = ["G^{*}=\frac{E^{*}}{2\left(1+v^{*}\right)}",
+latexList = ["s=a_{12}",
+             "G^{*}=\frac{E^{*}}{2\left(1+v^{*}\right)}",
              "\left(\sigma_{ r }^{*}\right)_{ P }=\left(\sigma_{ T }^{*}\right)_{ a }-\frac{1}{2}\left(G_{ p }^{*}-G_{ d }^{*}\right)\left(\varepsilon_{ i }^{*}-\varepsilon_{0}^{*}\right)",
              "\sigma_{0}=\frac{1}{\mu^{*}}\left(K_{ x } \sigma_{ x }^{*}+K_{ y } \sigma_{ y }^{*}+K_{ xy } \tau_{ xy }^{*}\right)",
              "\sigma_{ p }^{*}=K_{ skin }\left[\frac{E\alpha\left(T_{ m }-T_{ s }\right)}{(1-v)}\right]",
@@ -36,5 +37,6 @@ def Main(index):
     f.GetPyFunction("Formula_" + str(index))
 
 
-for index in range(0, 7):
-    Main(index)
+Main(0)
+# for index in range(0, 7):
+#     Main(index)
