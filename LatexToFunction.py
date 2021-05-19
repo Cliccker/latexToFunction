@@ -152,7 +152,7 @@ class Formula:
         """
         A = self.Multiply.searchString(self.latexText).asList()
         B = self.MultiplyMath.searchString(self.latexText).asList()
-        A = [item for item in A if item not in B]  # 这里相减是因为AlphaPara +"("会匹配到math.para，所以先匹配字符串中的math.x在减去
+        A = [item for item in A if item not in B]  # 这里相减是因为AlphaPara +"("会匹配到math.para，所以先匹配字符串中的math.x再将其减去
         for item in A:
             New = item[0] + "*" + item[1]
             Old = item[0] + item[1]
