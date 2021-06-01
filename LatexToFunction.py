@@ -8,7 +8,7 @@
 """
 
 from pyparsing import *
-import math  # 这个必须有
+import math,latexify  #必须有
 
 
 class Formula:
