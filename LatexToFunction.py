@@ -265,6 +265,6 @@ class Formula:
 
 
 if __name__ == "__main__":
-    f = Formula("A_{1}=t\left(L_{R}-\frac{t}{2 \sin [\alpha]}\right) ")
+    f = Formula("K_{vkin}=\frac{9.43983-421.179 \mu^{*}+6893.05 \mu^{*2}}{1+4991.39 \mu^{*}+6032.92 \mu^{*2}-1466.19 \mu^{*3}}")
     f.ToFunction()
     f.SaveAsPython("Arc")
