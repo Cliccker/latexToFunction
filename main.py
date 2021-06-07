@@ -30,7 +30,9 @@ latexList = ["s=a_{12}",
              "v_{ p }=\max \left[0.5-0.2\left(\frac{S_{v, k}}{S_{u,k}}\right) , v_{ e }\right]",
              "A_{2}=\frac{\sigma_{ uts } \exp \left[m_{2}\right]}{m_{2}^{m_{2}}}",
              "\theta=\arcsin \left[\frac{D_{R}-\frac{D_{i}}{2}+r_{k}}{r_{k}}\right]",
-             "A_{1}=t\left(L_{R}-\frac{t}{2 \tan [\alpha]}\right) \cdot \max \left[\left(\frac{\lambda}{5}\right)^{0.85}, { 1.0}\right]"]
+             "A_{1}=t\left(L_{R}-\frac{t}{2 \tan [\alpha]}\right) \cdot \min \left[\left(\frac{\lambda}{5}\right)^{0.85}, { 1.0}\right]",
+             "L_{ R }=\min \left[L_{ R 1}, L_{ R 2}, L_{ R 3}\right]+t_{ n }"]
+
 
 
 def Main(index):
