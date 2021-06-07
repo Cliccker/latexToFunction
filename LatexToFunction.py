@@ -30,6 +30,7 @@ class Formula:
             if bia in self.latexText:
                 self.latexText = self.latexText.replace(bia, bias[bia])
         # 基本运算符号
+        print(self.latexText)
         equal = Literal("=")  # 等于
         plus = Literal("+")  # 加
         minus = Literal("-")  # 减
@@ -69,7 +70,7 @@ class Formula:
         self.SpecialSymbol = self.SpecialSymbol.ignore(MathSymbol)
         Symbol = self.SpecialSymbol | MathSymbol | PlainSymbol  # 所有特殊字符
         # 数字参数
-        numPara = Combine(Word(nums) + Optional('.' + Word(nums)))  # 整数和小数
+        numPara = Combine(Optional("{") + Word(nums) + Optional('.' + Word(nums))+Optional("}"))  # 整数和小数
         # 字母参数
         Foot = Combine(Word(alphanums) + ZeroOrMore(comma + Word(alphanums)))  # 脚标的不同形式
         alphaParaUnit = Word(alphas) + Optional("_{" + Foot + "}") + Optional("'")  # 字母、带有脚标的字母
@@ -82,6 +83,7 @@ class Formula:
         self.Formula = Symbol | numPara | alphaPara | Lparen | Rparen | "{" | "}"  # 公式中包含的各个元素
         # 特殊计算
         calculatingUnit = self.SpecialSymbol | MathSymbol | alphaPara | numPara | PlainSymbol | Lparen | Rparen  #
+        print(calculatingUnit.searchString(self.latexText))
         # 特殊计算可能包括的参数形式
         self.bracketUnit = Group("{" + Combine(OneOrMore(calculatingUnit)) + "}")  # 特殊计算的参数（花括号）
         self.parenUnit = Group("(" + Combine(OneOrMore(calculatingUnit)) + ")")  # 特殊计算参数（圆括号）
@@ -265,6 +267,6 @@ class Formula:
 
 
 if __name__ == "__main__":
-    f = Formula("K_{vkin}=\frac{9.43983-421.179 \mu^{*}+6893.05 \mu^{*2}}{1+4991.39 \mu^{*}+6032.92 \mu^{*2}-1466.19 \mu^{*3}}")
+    f = Formula("K_{vkin}=\frac{9.43983-421.179 a^{*}+6893.05 \mu^{*2}}{1+4991.39 a^{*}+6032.92 a^{*2}-1466.19 a^{*3}}")
     f.ToFunction()
     f.SaveAsPython("Arc")
