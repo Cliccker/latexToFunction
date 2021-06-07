@@ -8,7 +8,7 @@
 """
 
 from pyparsing import *
-import math,latexify  #必须有
+import math, latexify  # 必须有
 
 
 class Formula:
@@ -22,7 +22,7 @@ class Formula:
         self.latexText = latex
         bias = {"\\": "", "\f": "f", "\a": "a", "\b": "b", "\n": "n", "\v": "v", "\t": "t", "\r": "r", "left": "",
                 "right": "", "[": "(", "]": ")", " ": "", "^{*}": "'", "^{*2}": "'^{2}",
-                "^{*3}": "'^{3}", "exp": "math.exp"}  # 所有可能产生歧义的字符，如转义、反斜杠、空格，可以直接转换的字符，如exp(x)
+                "^{*3}": "'^{3}", "exp": "math.exp", "cdot": "*"}  # 所有可能产生歧义的字符，如转义、反斜杠、空格，可以直接转换的字符，如exp(x)
         # 预处理
         for bia in bias.keys():
             if bia in self.latexText:
@@ -39,17 +39,22 @@ class Formula:
         Rparen = Literal(")")  # )
         PlainSymbol = equal | minus | plus | comma | multiply | divide | power
         # 特殊运算符号
+        arcSin = Literal("arcsin")  # 反正弦
+        arcCos = Literal("arccos")  # 反余弦
         Tanh = Literal("tanh")  # 双曲正切
         Cos = Literal("cos")  # 余弦
         Sin = Literal("sin")  # 正弦
         Tan = Literal("tan")  # 正切
+        self.latexArc = arcSin | arcCos
         self.triangleSymbol = Tanh | Cos | Sin | Tan  # 三角符号
         self.latexFrac = Literal('frac')  # 分数
         self.latexLn = Literal("ln")  # 自然对数
         self.latexPow = Literal("^")  # 指数
         self.latexSqrt = Literal("sqrt")  # 根号
-        self.SpecialSymbol = self.latexFrac | self.latexLn | self.latexPow | self.latexSqrt | self.triangleSymbol  # 所有特殊计算符号
+        self.SpecialSymbol = self.latexFrac | self.latexLn | self.latexPow | self.latexSqrt | self.triangleSymbol | self.latexArc  # 所有特殊计算符号
         # math库中的函数
+        mathASin = Literal("math.asin")
+        mathACos = Literal("math.acos")
         mathTanh = Literal("math.tanh")
         mathCos = Literal("math.cos")
         mathSin = Literal("math.sin")
@@ -58,7 +63,7 @@ class Formula:
         mathSqrt = Literal("math.sqrt")
         mathMax = Literal("max")  # 取最大值
         mathExp = Literal("math.exp")  # e^x
-        MathSymbol = mathTanh | mathCos | mathSin | mathTan | mathLog | mathSqrt | mathMax | mathExp
+        MathSymbol = mathASin | mathACos | mathTanh | mathCos | mathSin | mathTan | mathLog | mathSqrt | mathMax | mathExp
         self.SpecialSymbol = self.SpecialSymbol.ignore(MathSymbol)
         Symbol = self.SpecialSymbol | MathSymbol | PlainSymbol  # 所有特殊字符
         # 数字参数
@@ -74,8 +79,10 @@ class Formula:
         # 公式
         self.Formula = Symbol | numPara | alphaPara | Lparen | Rparen | "{" | "}"  # 公式中包含的各个元素
         # 特殊计算
-        calculatingUnit = self.SpecialSymbol | MathSymbol | alphaPara | numPara | PlainSymbol | Lparen | Rparen  # 特殊计算可能包括的参数形式
-        self.bracketUnit = Group("{" + Combine(OneOrMore(calculatingUnit)) + "}")  # 特殊计算的参数
+        calculatingUnit = self.SpecialSymbol | MathSymbol | alphaPara | numPara | PlainSymbol | Lparen | Rparen  #
+        # 特殊计算可能包括的参数形式
+        self.bracketUnit = Group("{" + Combine(OneOrMore(calculatingUnit)) + "}")  # 特殊计算的参数（花括号）
+        self.parenUnit = Group("(" + Combine(OneOrMore(calculatingUnit)) + ")")  # 特殊计算参数（圆括号）
         # 乘法
         self.Multiply = MathSymbol + Lparen | alphaPara + Lparen | numPara + Lparen | Rparen + (
                 alphaPara | numPara) | Rparen + Lparen | (alphaPara | numPara) + (alphaPara | numPara) | (
@@ -83,6 +90,7 @@ class Formula:
         self.mathMultiply = MathSymbol + Lparen
         # 公式、参数和特殊运算符
         self.formulaTokens = sum(self.Formula.searchString(self.latexText))  # 输出公式中的参数和运算符号
+        print(self.formulaTokens)
         self.Answer = self.formulaTokens[0]  # 结果
         self.latexText = self.latexText.replace(self.Answer + "=", "")  # 去除答案部分，因为在这里他不重要
         self.alphaParaTokens = alphaPara.searchString(self.latexText).asList()  # 所有变量
@@ -123,6 +131,31 @@ class Formula:
         """
         Triangle = self.triangleSymbol + self.bracketUnit
         self.TransToMath(Triangle)
+
+    def ReplaceTriangle(self):
+        """
+        替换三角函数
+        三角函数可能出现tan{下}和tan(x)等多种情况
+        """
+        Triangle = self.triangleSymbol
+        Tokens = Triangle.searchString(self.latexText).asList()
+        for item in Tokens:
+            New = "math." + item[0]
+            Original = item[0]
+            self.latexText = self.latexText.replace(Original, New)
+
+    def TransArc(self):
+        """
+        转换反三角函数
+        """
+        Arc = self.latexArc
+        ArcTokens = Arc.searchString(self.latexText).asList()
+        arcDict = {"arcsin": "math.asin", "arccos": "math.acos"}
+        for item in ArcTokens:
+            New = arcDict[item[0]]
+            Old = item[0]
+            self.latexText = self.latexText.replace(Old, New)
+        # print(ArcTokens)
 
     def TransPow(self):
         """
@@ -203,8 +236,10 @@ class Formula:
         while count < 20:
             if self.specialSymbolTokens:
                 count += 1
-                self.TransLn()
+                self.TransLn()  # 对数
+                self.TransArc()
                 self.TransTriangle()
+                self.ReplaceTriangle()
                 self.TransPow()
                 self.TransSqrt()
                 self.TransFrac()
@@ -249,6 +284,8 @@ class Formula:
         b = [i[0] for i in a]
         c = [newParaName[i] if i in newParaName else i for i in b]
         formula = "".join(c)
+        formula = formula.replace("{", "(")
+        formula = formula.replace("}", ")")
         NewParas = ",".join(newParaName.values())
         # python文件内容
         Line_0 = "import math,latexify"  # 库
@@ -262,3 +299,9 @@ class Formula:
             File.write(Line)
         print("Validation:")
         exec(compile(open(SavedFilename, "rb").read(), SavedFilename, "exec"))  # 执行保存下的函数
+
+
+if __name__ == "__main__":
+    f = Formula("A_{1}=t\left(L_{R}-\frac{t}{2 \sin [\alpha]}\right) ")
+    f.ToFunction()
+    f.ToPyFile("Arc")

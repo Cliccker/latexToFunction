@@ -28,7 +28,9 @@ latexList = ["s=a_{12}",
              "K_{ e , k }=1.0+\frac{(1-n)}{n*(m-1)}\left(\frac{\Delta S_{ n , k }}{S_{P S }}-1\right)",
              "F=\frac{\frac{tanh{1}}{A_{x}^{24}+2}+1}{\sqrt{B_{x}\ln{S_{1}}}}",
              "v_{ p }=\max \left[0.5-0.2\left(\frac{S_{v, k}}{S_{u,k}}\right) , v_{ e }\right]",
-             "A_{2}=\frac{\sigma_{ uts } \exp \left[m_{2}\right]}{m_{2}^{m_{2}}}"]
+             "A_{2}=\frac{\sigma_{ uts } \exp \left[m_{2}\right]}{m_{2}^{m_{2}}}",
+             "\theta=\arcsin \left[\frac{D_{R}-\frac{D_{i}}{2}+r_{k}}{r_{k}}\right]",
+             "A_{1}=t\left(L_{R}-\frac{t}{2 \tan [\alpha]}\right) \cdot \max \left[\left(\frac{\lambda}{5}\right)^{0.85}, { 1.0}\right]"]
 
 
 def Main(index):
@@ -38,5 +40,5 @@ def Main(index):
 
 
 
-for index in range(0, 7):
+for index in range(0, len(latexList)):
      Main(index)
