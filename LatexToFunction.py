@@ -87,7 +87,7 @@ class Formula:
         self.parenUnit = Group("(" + Combine(OneOrMore(calculatingUnit)) + ")")  # 特殊计算参数（圆括号）
         # 乘法
         self.Multiply = MathSymbol + Lparen | alphaPara + Lparen | numPara + Lparen | Rparen + (
-                alphaPara | numPara) | Rparen + Lparen | (alphaPara | numPara) + (alphaPara | numPara) | (
+                alphaPara | numPara) | Rparen + Lparen | (alphaPara | numPara) + alphaPara| (
                                 alphaPara | numPara) + MathSymbol
         self.mathMultiply = MathSymbol + Lparen
         # 公式、参数和特殊运算符
@@ -222,21 +222,14 @@ class Formula:
 
         self.function = self.latexText
 
-    def GetResult(self):
+    def Result(self):
         """
         计算结果
         """
         self.InputValue()
         self.Calculate()
 
-    def GetPyFunction(self, FunctionName):
-        """
-        生成py文件
-        :param FunctionName: 生成py文件中函数的名称
-        """
-        self.ToPyFile(FunctionName)
-
-    def ToPyFile(self, FunctionName):
+    def SaveAsPython(self, FunctionName):
         """
         将计算公式转换为python文件
         """
@@ -274,4 +267,4 @@ class Formula:
 if __name__ == "__main__":
     f = Formula("A_{1}=t\left(L_{R}-\frac{t}{2 \sin [\alpha]}\right) ")
     f.ToFunction()
-    f.ToPyFile("Arc")
+    f.SaveAsPython("Arc")

@@ -34,13 +34,10 @@ latexList = ["s=a_{12}",
              "L_{ R }=\min \left[L_{ R 1}, L_{ R 2}, L_{ R 3}\right]+t_{ n }"]
 
 
-
 def Main(index):
     f = Formula(latex=latexList[index])
     f.ToFunction()
-    f.GetPyFunction("Formula_" + str(index))
-
-
+    f.SaveAsPython("Formula_" + str(index))
 
 for index in range(0, len(latexList)):
-     Main(index)
+    Main(index)
