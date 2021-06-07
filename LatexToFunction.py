@@ -20,9 +20,11 @@ class Formula:
         """
         self.function = ""
         self.latexText = latex
+        self.Original = latex
         bias = {"\\": "", "\f": "f", "\a": "a", "\b": "b", "\n": "n", "\v": "v", "\t": "t", "\r": "r", "left": "",
                 "right": "", "[": "(", "]": ")", " ": "", "^{*}": "'", "^{*2}": "'^{2}",
-                "^{*3}": "'^{3}", "exp": "math.exp", "cdot": "*"}  # 所有可能产生歧义的字符，如转义、反斜杠、空格，可以直接转换的字符，如exp(x)
+                "^{*3}": "'^{3}", "exp": "math.exp", "cdot": "*",
+                "ln": "math.log", "sqrt": "math.sqrt", "^": "**"}  # 所有可能产生歧义的字符，如转义、反斜杠、空格，可以直接转换的字符，如exp(x)
         # 预处理
         for bia in bias.keys():
             if bia in self.latexText:
@@ -90,7 +92,6 @@ class Formula:
         self.mathMultiply = MathSymbol + Lparen
         # 公式、参数和特殊运算符
         self.formulaTokens = sum(self.Formula.searchString(self.latexText))  # 输出公式中的参数和运算符号
-        print(self.formulaTokens)
         self.Answer = self.formulaTokens[0]  # 结果
         self.latexText = self.latexText.replace(self.Answer + "=", "")  # 去除答案部分，因为在这里他不重要
         self.alphaParaTokens = alphaPara.searchString(self.latexText).asList()  # 所有变量
@@ -114,16 +115,6 @@ class Formula:
             Original = item[0] + ''.join(item[1])
             self.latexText = self.latexText.replace(Original, New)
 
-    def TransLn(self):
-        """
-        转换对数函数
-        """
-        Ln = self.latexLn + self.bracketUnit
-        Tokens = Ln.searchString(self.latexText).asList()
-        for item in Tokens:
-            New = "math.log(" + item[1][1] + ")"
-            Original = item[0] + ''.join(item[1])
-            self.latexText = self.latexText.replace(Original, New)
 
     def TransTriangle(self):
         """
@@ -155,25 +146,6 @@ class Formula:
             New = arcDict[item[0]]
             Old = item[0]
             self.latexText = self.latexText.replace(Old, New)
-        # print(ArcTokens)
-
-    def TransPow(self):
-        """
-        将所有^转换成**
-        """
-        Power = self.latexPow + self.bracketUnit
-        PowerTokens = Power.searchString(self.latexText).asList()
-        for item in PowerTokens:
-            New = "**(" + item[1][1] + ")"
-            Old = item[0] + ''.join(item[1])
-            self.latexText = self.latexText.replace(Old, New)
-
-    def TransSqrt(self):
-        """
-        将所有sqrt转换成math.sqrt(x)
-        """
-        Sqrt = self.latexSqrt + self.bracketUnit
-        self.TransToMath(Sqrt)
 
     def TransFrac(self):
         """
@@ -236,12 +208,9 @@ class Formula:
         while count < 20:
             if self.specialSymbolTokens:
                 count += 1
-                self.TransLn()  # 对数
                 self.TransArc()
                 self.TransTriangle()
                 self.ReplaceTriangle()
-                self.TransPow()
-                self.TransSqrt()
                 self.TransFrac()
                 self.SearchSpePara()
             else:
@@ -299,6 +268,7 @@ class Formula:
             File.write(Line)
         print("Validation:")
         exec(compile(open(SavedFilename, "rb").read(), SavedFilename, "exec"))  # 执行保存下的函数
+        print("\n")
 
 
 if __name__ == "__main__":
