@@ -37,7 +37,6 @@ def Main(index):
     f = Formula(latex=latexList[index])
     f.ToFunction()
     f.SaveAsPython("Formula_" + str(index))
-    f.Result()
 
 
 for index in range(0, len(latexList)):

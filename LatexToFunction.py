@@ -266,11 +266,13 @@ class Formula:
         """
         # 为每一个参数找到替换的参数
         newParaName = {}
-        Para = [chr(i) for i in range(65, 91)]
+        showPara = {"result_para": self.Answer}  # python文件中的参数索引字典
+        Para = [chr(i) for i in range(65, 91)]  # 按照英文字母生成新参数
         count = 0
         for item in self.alphaParaTokens:
             if item[0] not in newParaName.keys():
                 newParaName[item[0]] = Para[count]
+                showPara[Para[count]] = item[0]
                 count += 1
         # 重新组织新的Python函数式
         a = self.Formula.searchString(self.function).asList()
@@ -282,10 +284,10 @@ class Formula:
         NewParas = ",".join(newParaName.values())
         # python文件内容
         Line_0 = "import math,latexify"  # 库
-        Line_1 = "\n\nParas = " + str(newParaName)  # 参数索引
+        Line_1 = "\n\nParas = " + str(showPara)  # 参数索引
         Line_2 = "\n\n@latexify.with_latex"  # 域
-        Line_3 = "\n\ndef " + FunctionName + "(" + NewParas + "):" + "\n" + "\t" + "return " + formula  # 函数主体
-        Line_4 = "\n\nprint(" + FunctionName + ")"  # 显示latex函数
+        Line_3 = "\n\ndef Formula(" + NewParas + "):" + "\n" + "\t" + "return " + formula  # 函数主体
+        Line_4 = "\n\nprint(Formula)"  # 显示latex函数
         Line = Line_0 + Line_1 + Line_2 + Line_3 + Line_4
         SavedFilename = "Data/" + FunctionName + ".py"
         with open(SavedFilename, "w+") as File:
