@@ -40,6 +40,5 @@ def Main(index):
     f.Result()
 
 
-
 for index in range(0, len(latexList)):
-     Main(index)
+    Main(index)
