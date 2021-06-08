@@ -86,7 +86,7 @@ class Formula:
         self.parenUnit = Group("(" + Combine(OneOrMore(calculatingUnit)) + ")")  # 特殊计算参数（圆括号）
         # 乘法
         self.Multiply = MathSymbol + Lparen | alphaPara + Lparen | numPara + Lparen | Rparen + (
-                alphaPara | numPara) | Rparen + Lparen | (alphaPara | numPara) + (alphaPara | numPara) | (
+                alphaPara | numPara) | Rparen + Lparen | (alphaPara | numPara) + alphaPara | (
                                 alphaPara | numPara) + MathSymbol
         self.mathMultiply = MathSymbol + Lparen
         # 公式、参数和特殊运算符
