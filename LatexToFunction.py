@@ -62,8 +62,9 @@ class Formula:
         mathLog = Literal("math.log")  # 对数
         mathSqrt = Literal("math.sqrt")
         mathMax = Literal("max")  # 取最大值
+        mathMin = Literal("min")  # 取最小值
         mathExp = Literal("math.exp")  # e^x
-        MathSymbol = mathASin | mathACos | mathTanh | mathCos | mathSin | mathTan | mathLog | mathSqrt | mathMax | mathExp
+        MathSymbol = mathASin | mathACos | mathTanh | mathCos | mathSin | mathTan | mathLog | mathSqrt | mathMax | mathMin | mathExp
         self.SpecialSymbol = self.SpecialSymbol.ignore(MathSymbol)
         Symbol = self.SpecialSymbol | MathSymbol | PlainSymbol  # 所有特殊字符
         # 数字参数
@@ -90,7 +91,6 @@ class Formula:
         self.mathMultiply = MathSymbol + Lparen
         # 公式、参数和特殊运算符
         self.formulaTokens = sum(self.Formula.searchString(self.latexText))  # 输出公式中的参数和运算符号
-        print(self.formulaTokens)
         self.Answer = self.formulaTokens[0]  # 结果
         self.latexText = self.latexText.replace(self.Answer + "=", "")  # 去除答案部分，因为在这里他不重要
         self.alphaParaTokens = alphaPara.searchString(self.latexText).asList()  # 所有变量
@@ -253,21 +253,14 @@ class Formula:
 
         self.function = self.latexText
 
-    def GetResult(self):
+    def Result(self):
         """
         计算结果
         """
         self.InputValue()
         self.Calculate()
 
-    def GetPyFunction(self, FunctionName):
-        """
-        生成py文件
-        :param FunctionName: 生成py文件中函数的名称
-        """
-        self.ToPyFile(FunctionName)
-
-    def ToPyFile(self, FunctionName):
+    def SaveAsPython(self, FunctionName):
         """
         将计算公式转换为python文件
         """
@@ -297,11 +290,12 @@ class Formula:
         SavedFilename = "Data/" + FunctionName + ".py"
         with open(SavedFilename, "w+") as File:
             File.write(Line)
+        print("\n")
         print("Validation:")
-        exec(compile(open(SavedFilename, "rb").read(), SavedFilename, "exec"))  # 执行保存下的函数
+        exec(compile(open(SavedFilename, "rb").read(), SavedFilename, "exec"))  # 执行python文件
 
 
 if __name__ == "__main__":
     f = Formula("A_{1}=t\left(L_{R}-\frac{t}{2 \sin [\alpha]}\right) ")
     f.ToFunction()
-    f.ToPyFile("Arc")
+    f.SaveAsPython("Arc")

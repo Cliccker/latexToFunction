@@ -36,7 +36,8 @@ latexList = ["s=a_{12}",
 def Main(index):
     f = Formula(latex=latexList[index])
     f.ToFunction()
-    f.GetPyFunction("Formula_" + str(index))
+    f.SaveAsPython("Formula_" + str(index))
+    f.Result()
 
 
 
