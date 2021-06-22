@@ -12,7 +12,7 @@
 + [word]表示“word为可选项”
 + | 表示有可能出现的情况
 
-## 基本运算符号
+## 基本运算符号（形式一致）
 
 ```python
 equal ::= "=" # 等于
@@ -21,6 +21,12 @@ minus ::= "-"  # 减
 multiply ::= "*"  # 乘
 divide ::= "/" # 除
 power ::= "**"  # 幂
+basicSymbol ::= equal | plus |minus| multiply | divide | power
+```
+
+## 标记符号
+
+```python
 comma ::= ","  # 逗号
 Lparen ::= "("  # 左括号
 Rparen ::= ")"  # 右括号
@@ -28,26 +34,34 @@ Rparen ::= ")"  # 右括号
 
 ## 特殊运算符号
 
+### latex形式
+
 ```python
-Tanh ::= "tanh"  # 双曲正切
-Cos ::= "cos" # 余弦
-Sin ::= "sin"  # 正弦
-Tan ::= "tan"  # 正切
-latexFrac ::= 'frac'  # 分数
+max ::= "max"  # 取最大值
+min ::= "min"  # 取最小值
+latexFrac ::= "frac"  # 分数
 latexLn ::= "ln"  # 自然对数
 latexPow ::= "^"  # 指数
 latexSqrt ::= "sqrt"  # 根号
-mathTanh ::= "math.tanh"
-mathCos ::= "math.cos"
-mathSin ::= "math.sin"
-mathTan ::= "math.tan"
-mathLog ::= "math.log"  # 对数
-mathSqrt ::= "math.sqrt"
-mathMax ::= "max"  # 取最大值
-mathExp ::= "math.exp"  # e^x
-plainSymbol ::= equal | minus | plus | comma | multiply | divide | power
-triangleSymbol ::= Tanh | Cos | Sin | Tan 
+latexArcsin ::="arcsin" # 反正弦
+latexArccos ::="arccos" # 反余弦
+latexTanh ::= "tanh"  # 双曲正切
+latexCos ::= "cos" # 余弦
+latexSin ::= "sin"  # 正弦
+latexTan ::= "tan"  # 正切
+triangleSymbol ::= latexArcsin | latexArccos | latexTanh | latexCos | latexSin | latexTan 
 SpecialSymbol ::= latexFrac | latexLn | latexPow | latexSqrt | triangleSymbol
+```
+### python形式
+
+```python
+pyTanh ::= "math.tanh"
+pyCos ::= "math.cos"
+pySin ::= "math.sin"
+pyTan ::= "math.tan"
+pyLn ::= "math.log"  # 对数
+pySqrt ::= "math.sqrt"
+pyExp ::= "math.exp"  # e^x
 ```
 
 ##  参数的形式
@@ -68,14 +82,57 @@ alphaPara ::= Complicated AlphaPara | Simple AlphaPara # 参数
 ## 特殊计算的形式
 
 ```python
-calculatingUnit ::= SpecialSymbol | MathSymbol | alphaPara | numPara | PlainSymbol | Lparen | Rparen
+calculatingUnit ::= SpecialSymbol | MathSymbol | alphaPara | numPara | basicSymbol | Lparen | Rparen |comma
 bracketUnit ::="{" caculationUnit+ "}"
 Ln ::= latexLn bracketUnit
 Triangle ::= triangleSymbol bracketUnit
 Power ::= latexPow bracketUnit
 Sqrt ::= latexSqrt bracketUnit
 Frac ::= latexFrac bracketUnit bracketUnit
-Multiply =alphaPara Lparen | numPara Lparen | Rparen (alphaPara | numPara) | Rparen Lparen | (alphaPara | numPara) (alphaPara | numPara) | (alphaPara | numPara) MathSymbol
+Multiply ::= alphaPara Lparen | numPara Lparen | Rparen (alphaPara | numPara) | Rparen Lparen | (alphaPara | numPara) alphaPara| (alphaPara | numPara) MathSymbol
 ```
 
-​    
+   
+
+# 基于文法的设计公式建模
+
+
+
+表1 设计计算公式中的符号
+
+| 操作名称    | Python运算符 | Latex字符   |
+| ----------- | ------------ | ----------- |
+| plus        | x+y          | x+y         |
+| minus       | x-y          | x-y         |
+| multiply    | x*y          | x*y         |
+| divide      | x/y          | x/y         |
+| power       | x**y         | x^y         |
+| fraction    | x/y          | \frac{x}{y} |
+| square root | math.sqrt(x) | \sqrt{x}    |
+| ln          | math.log(x)  | \ln{x}      |
+| max         | max(x,y)     | \max(x,y)   |
+| min         | min(x,y)     | \min(x,y)   |
+| tanh        | math.tanh(x) | \tanh(x)    |
+| arccos      | math.acos(x) | \arccos(x)  |
+| arcsin      | math.asin(x) | \arcsin(x)  |
+| cos         | math.cos(x)  | \cos(x)     |
+| sin         | math.sin(x)  | \sin(x)     |
+| tan         | math.tan(x)  | \tan(x)     |
+| exponential | math.exp(x)  | \exp(x)     |
+
+
+
+```python
+import math, latexify
+
+Index = {...}
+
+
+@latexify.with_latex
+def Formula(...):
+    return ...
+
+```
+
+
+
