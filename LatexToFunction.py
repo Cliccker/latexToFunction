@@ -11,9 +11,6 @@ from pyparsing import *
 import math, latexify  # 必须有
 
 
-def p(x):
-    print(x)
-
 class Formula:
 
     def __init__(self, latex):
@@ -147,7 +144,6 @@ class Formula:
             New = "math." + item[0]
             Original = item[0]
             self.latexText = self.latexText.replace(Original, New)
-
 
     def TransArc(self):
         """
