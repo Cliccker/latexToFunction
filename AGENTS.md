@@ -4,7 +4,7 @@
 
 `LatexToFunction.py` exposes `Formula`, controlled numerical evaluation, and standalone Python export. `formula_parser.py` implements tokenization, recursive descent, source-positioned errors, and the expression tree. `main.py` contains 13 engineering examples behind a main guard. `tests/` holds first-party regression tests. `README.md` documents supported syntax and migration from the old API.
 
-`Data/` and `Files/` are ignored output directories. Historical `venv/`, `__pycache__/`, and `.idea/` artifacts are tracked; leave them untouched during normal contributions.
+`Data/` and `Files/` are ignored output directories. Virtual environments (`venv/`, `.venv/`), Python caches, and `.idea/` are ignored local artifacts; keep them out of commits.
 
 ## Build, Test, and Development Commands
 
