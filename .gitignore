@@ -1,2 +1,5 @@
 /Data/
 /Files/
+.venv/
+__pycache__/
+*.py[cod]
